@@ -2,7 +2,7 @@
  * Design: Evidence Ledger — a vertically narrated research safety case. The page intentionally
  * uses visual labels, claims status, and interactive diagrams to distinguish results from plans.
  */
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowDown,
@@ -19,6 +19,7 @@ import {
   Info,
   LockKeyhole,
   Play,
+  Pause,
   RefreshCcw,
   ScanSearch,
   ShieldAlert,
@@ -26,8 +27,9 @@ import {
   SlidersHorizontal,
   UserRoundCheck,
   XCircle,
+  X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -63,6 +65,57 @@ const assets = {
 } as const;
 
 const asset = (file: keyof typeof assets) => assets[file];
+
+const demoScenes = [
+  {
+    id: "overload",
+    number: "01",
+    chapter: "SOC alert overload",
+    title: "A queue can grow faster than one analyst can inspect it.",
+    caption: "The study targets one bounded task: help an L1 analyst distinguish likely true positives from false positives—without replacing the analyst.",
+    status: "ILLUSTRATIVE CONTEXT",
+  },
+  {
+    id: "provenance",
+    number: "02",
+    chapter: "Evidence boundaries",
+    title: "Not every log value is trustworthy input.",
+    caption: "Rule metadata may be sensor-controlled. Usernames, URLs, command lines, and payloads may be attacker-writable evidence—not instructions for the model.",
+    status: "SYNTHETIC EXAMPLE",
+  },
+  {
+    id: "policy",
+    number: "03",
+    chapter: "Bounded policy",
+    title: "The small policy returns a verdict, a rationale, and cited evidence.",
+    caption: "The planned QLoRA-tuned Qwen policy is a proposed P1 component. Structured output improves parseability, but does not prove semantic safety.",
+    status: "P1 · PLANNED",
+  },
+  {
+    id: "calibration",
+    number: "04",
+    chapter: "Separate correctness estimate",
+    title: "A second component asks whether the first verdict is likely correct.",
+    caption: "P(verdict correct) is not P(malicious). The proposed calibrator learns to estimate whether the target policy's own decision is reliable.",
+    status: "P2 · PLANNED",
+  },
+  {
+    id: "gate",
+    number: "05",
+    chapter: "Selective triage",
+    title: "Only a frozen, label-specific gate can route an alert onward.",
+    caption: "High-confidence FP may enter an auto-close candidate path. High-confidence TP is prioritized. Every uncertain or invalid outcome returns to an analyst.",
+    status: "SIMULATED ROUTING",
+  },
+  {
+    id: "attack",
+    number: "06",
+    chapter: "Safety-critical test",
+    title: "The central test is whether confidence remains honest under attack.",
+    caption: "P3 compares clean and injected alert pairs. A safe system becomes uncertain and defers; a false auto-close would be a critical negative result to preserve.",
+    status: "P3 · PLANNED EVALUATION",
+  },
+] as const;
 
 function StatusStamp({ kind, children }: { kind: StatusKind; children: React.ReactNode }) {
   const Icon = kind === "completed" ? CheckCircle2 : kind === "active" ? Clock3 : kind === "illustrative" ? Eye : CircleDashed;
@@ -116,7 +169,20 @@ export default function Home() {
   const [attackClass, setAttackClass] = useState("Direct override");
   const [attackField, setAttackField] = useState("Command line");
   const [failureMode, setFailureMode] = useState<FailureMode>("danger");
+  const [demoOpen, setDemoOpen] = useState(false);
+  const [demoSceneIndex, setDemoSceneIndex] = useState(0);
+  const [demoPlaying, setDemoPlaying] = useState(true);
+  const reducedMotion = useReducedMotion();
   const route = confidence >= 88 ? "auto" : confidence >= 78 ? "priority" : "review";
+  const demoScene = demoScenes[demoSceneIndex];
+
+  useEffect(() => {
+    if (!demoOpen || !demoPlaying || reducedMotion) return;
+    const sceneTimer = window.setTimeout(() => {
+      setDemoSceneIndex((current) => (current + 1) % demoScenes.length);
+    }, 6200);
+    return () => window.clearTimeout(sceneTimer);
+  }, [demoOpen, demoPlaying, demoSceneIndex, reducedMotion]);
 
   const routeCopy = useMemo(() => {
     if (route === "auto") return "Illustrative FP result would meet the auto-close candidate gate.";
@@ -125,6 +191,11 @@ export default function Home() {
   }, [route]);
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const openDemo = () => {
+    setDemoSceneIndex(0);
+    setDemoPlaying(true);
+    setDemoOpen(true);
+  };
 
   return (
     <div className="app-shell">
@@ -157,7 +228,7 @@ export default function Home() {
             <h1 id="hero-heading">Trace the decision <em>before</em> you trust the gate.</h1>
             <p className="hero-lede">Can a lightweight local model reduce alert fatigue without confidently auto-closing an attacker-manipulated alert?</p>
             <div className="hero-actions">
-              <button className="primary-action" onClick={() => scrollTo("system")}>
+              <button className="primary-action" onClick={openDemo}>
                 <Play size={15} fill="currentColor" /> Start the demonstration
               </button>
               <button className="secondary-action" onClick={() => scrollTo("evidence")}>
@@ -426,8 +497,116 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <DemoPlayer
+        active={demoOpen}
+        playing={demoPlaying}
+        scene={demoScene}
+        sceneIndex={demoSceneIndex}
+        onClose={() => setDemoOpen(false)}
+        onTogglePlayback={() => setDemoPlaying((playing) => !playing)}
+        onPrevious={() => setDemoSceneIndex((current) => (current - 1 + demoScenes.length) % demoScenes.length)}
+        onNext={() => setDemoSceneIndex((current) => (current + 1) % demoScenes.length)}
+        onSelectScene={setDemoSceneIndex}
+      />
     </div>
   );
+}
+
+function DemoPlayer({
+  active,
+  playing,
+  scene,
+  sceneIndex,
+  onClose,
+  onTogglePlayback,
+  onPrevious,
+  onNext,
+  onSelectScene,
+}: {
+  active: boolean;
+  playing: boolean;
+  scene: (typeof demoScenes)[number];
+  sceneIndex: number;
+  onClose: () => void;
+  onTogglePlayback: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  onSelectScene: (index: number) => void;
+}) {
+  const reduced = useReducedMotion();
+
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div
+          className="demo-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Animated research demonstration"
+          initial={reduced ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.section
+            className="demo-player"
+            initial={reduced ? false : { opacity: 0, y: 20, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: 0.985 }}
+            transition={{ duration: 0.34, ease: [0.23, 1, 0.32, 1] }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header className="demo-player-head">
+              <div className="demo-brand"><img src={asset("evidence-gate-logo.png")} alt="" /><span><b>Guided research demonstration</b><small>Video-style sequence · 6 scenes</small></span></div>
+              <button className="demo-close" onClick={onClose} aria-label="Close animated demonstration"><X size={20} /></button>
+            </header>
+            <div className="demo-stage-wrap">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={scene.id}
+                  className={`demo-stage scene-${scene.id}`}
+                  initial={reduced ? false : { opacity: 0, y: 15, filter: "blur(5px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={reduced ? undefined : { opacity: 0, y: -12, filter: "blur(4px)" }}
+                  transition={{ duration: 0.42, ease: [0.23, 1, 0.32, 1] }}
+                >
+                  <div className="demo-stage-grid" aria-hidden="true" />
+                  <DemoSceneVisual scene={scene.id} />
+                  <div className="demo-scene-meta"><span>{scene.number} / 06</span><StatusStamp kind="illustrative">{scene.status}</StatusStamp></div>
+                  <div className="demo-scene-copy"><p>{scene.chapter}</p><h2>{scene.title}</h2></div>
+                </motion.div>
+              </AnimatePresence>
+              <div className="demo-captions"><span className="caption-tag">ON-SCREEN NARRATION</span><p>{scene.caption}</p></div>
+            </div>
+            <footer className="demo-controls">
+              <div className="demo-play-controls"><button onClick={onPrevious} aria-label="Previous scene"><ChevronRight size={19} style={{ transform: "rotate(180deg)" }} /></button><button className="demo-play-button" onClick={onTogglePlayback} aria-label={playing ? "Pause animation" : "Play animation"}>{playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}{playing ? "Pause" : "Play"}</button><button onClick={onNext} aria-label="Next scene"><ChevronRight size={19} /></button></div>
+              <div className="demo-timeline" aria-label="Scene navigation">{demoScenes.map((item, index) => <button key={item.id} className={`timeline-segment ${index === sceneIndex ? "current" : ""} ${index < sceneIndex ? "watched" : ""}`} onClick={() => onSelectScene(index)} aria-label={`Go to scene ${index + 1}: ${item.chapter}`}><span /></button>)}</div>
+              <span className="demo-timecode">{scene.number} · {playing ? "PLAYING" : "PAUSED"}</span>
+            </footer>
+          </motion.section>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function DemoSceneVisual({ scene }: { scene: (typeof demoScenes)[number]["id"] }) {
+  if (scene === "overload") {
+    return <div className="scene-art overload-art"><div className="alert-stream left">{["DNS anomaly", "Process event", "HTTP signal", "Rule hit", "Endpoint alert"].map((label, index) => <span key={label} style={{ "--delay": `${index * 0.16}s` } as React.CSSProperties}>{label}</span>)}</div><div className="scene-analyst"><div className="analyst-head" /><div className="analyst-body" /><i /></div><div className="alert-stream right">{["Queue +1", "Queue +1", "Queue +1", "Queue +1"].map((label, index) => <span key={`${label}-${index}`} style={{ "--delay": `${0.4 + index * 0.18}s` } as React.CSSProperties}>{label}</span>)}</div><div className="overload-route"><b>TRIAGE</b><i /><i /><i /></div></div>;
+  }
+  if (scene === "provenance") {
+    return <div className="scene-art provenance-art"><div className="provenance-card"><span className="pv-title">SYNTHETIC ALERT</span><div className="pv-row trusted-row"><b>Rule severity</b><i>High</i><small>Trusted</small></div><div className="pv-row trusted-row"><b>Rule description</b><i>Process behavior</i><small>Trusted</small></div><div className="pv-row untrusted-row"><b>Command line</b><i>synthetic value</i><small>Writable</small></div><div className="pv-row untrusted-row"><b>Destination</b><i>example.invalid</i><small>Writable</small></div></div><div className="provenance-bar trusted-bar"><span>TRUSTED METADATA</span></div><div className="provenance-bar untrusted-bar"><span>ATTACKER-WRITABLE EVIDENCE</span></div></div>;
+  }
+  if (scene === "policy") {
+    return <div className="scene-art policy-scene-art"><div className="policy-input-card"><span>NORMALIZED ALERT</span><i /><i /><i /><i /></div><div className="policy-core"><div className="core-ring outer" /><div className="core-ring inner" /><b>QWEN<br /><small>POLICY</small></b></div><div className="policy-output-card"><span>STRUCTURED OUTPUT</span><strong>VERDICT <i>TP</i></strong><p>Rationale + cited fields</p></div><div className="policy-link" /></div>;
+  }
+  if (scene === "calibration") {
+    return <div className="scene-art calibration-scene-art"><div className="cal-input"><b>Alert</b><b>Verdict</b><b>Rationale</b><b>Evidence</b></div><div className="cal-bridge"><i /><i /><i /></div><div className="cal-core"><span>P</span><strong>0.41</strong><small>VERDICT CORRECT</small></div><div className="cal-warning"><AlertTriangle size={20} /><span>Not probability<br />of maliciousness</span></div></div>;
+  }
+  if (scene === "gate") {
+    return <div className="scene-art gate-scene-art"><div className="gate-input"><span>POLICY + CALIBRATOR</span><strong>Confidence</strong><i /><i /><i /></div><div className="scene-gate"><b>FROZEN<br />GATE</b></div><div className="scene-routes"><div className="route-route green"><Check size={18} /><span>Auto-close<br /><small>candidate</small></span></div><div className="route-route blue"><ArrowRight size={18} /><span>Priority<br /><small>analyst review</small></span></div><div className="route-route amber"><UserRoundCheck size={18} /><span>Normal<br /><small>analyst review</small></span></div></div></div>;
+  }
+  return <div className="scene-art attack-scene-art"><div className="paired-doc clean-doc"><span>CLEAN SOURCE</span><i /><i /><i /><i /></div><div className="attack-arrow"><ArrowRight size={29} /><small>ONE WRITABLE FIELD</small></div><div className="paired-doc injected-doc"><span>INJECTED VARIANT</span><i /><i /><i className="injection-line" /><i /></div><div className="attack-outcomes"><div><XCircle size={20} /><span>False auto-close<br /><small>danger hypothesis</small></span></div><div><UserRoundCheck size={20} /><span>Analyst review<br /><small>desired safe response</small></span></div></div></div>;
 }
 
 function FailureStep({ n, text, danger = false, safe = false }: { n: string; text: string; danger?: boolean; safe?: boolean }) {
