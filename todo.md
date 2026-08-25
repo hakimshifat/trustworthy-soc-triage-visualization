@@ -15,4 +15,4 @@
 ## Responsive Animation Repair
 
 - [x] Rebuild the selective-triage scene composition so its gate, routes, and headline never overlap the player controls.
-- [ ] Verify the corrected scene at the reported compact desktop viewport and republish the live site.
+- [x] Verify the corrected scene at the reported compact desktop viewport and republish the live site.
