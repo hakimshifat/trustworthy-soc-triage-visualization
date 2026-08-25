@@ -55,6 +55,15 @@ const attackText: Record<string, string> = {
   Obfuscation: "[synthetic text: encoded-looking harmless fragment]",
 };
 
+const assets = {
+  "evidence-gate-logo.png": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663894373008/UPZHFyWPjxuYDEUa.png",
+  "soc-evidence-ledger-hero.jpg": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663894373008/WDUYzWeaLFzObQiq.jpg",
+  "provenance-threads.jpg": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663894373008/CFwcgccNBSkOUkat.jpg",
+  "calibration-gate.jpg": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663894373008/mLqjZfyYxVnTjZRx.jpg",
+} as const;
+
+const asset = (file: keyof typeof assets) => assets[file];
+
 function StatusStamp({ kind, children }: { kind: StatusKind; children: React.ReactNode }) {
   const Icon = kind === "completed" ? CheckCircle2 : kind === "active" ? Clock3 : kind === "illustrative" ? Eye : CircleDashed;
   return (
@@ -126,7 +135,7 @@ export default function Home() {
 
       <header className="site-header">
         <a href="#top" className="brand-lockup" aria-label="Trustworthy SOC L1 Triage home">
-          <img className="brand-logo" src="/manus-storage/evidence-gate-logo_7f83e168.png" alt="Abstract evidence gate" />
+          <img className="brand-logo" src={asset("evidence-gate-logo.png")} alt="Abstract evidence gate" />
           <span>
             <span className="brand-title">Trustworthy Triage</span>
             <span className="brand-subtitle">Evidence Ledger</span>
@@ -158,7 +167,7 @@ export default function Home() {
             <div className="hero-note"><Info size={16} /> This is a transparent research simulator, not a live SOC product. All public alert values are synthetic, masked, or independently public.</div>
           </div>
           <div className="hero-visual" aria-hidden="true">
-            <img className="hero-image" src="/manus-storage/soc-evidence-ledger-hero_dd67e55a.jpg" alt="" />
+            <img className="hero-image" src={asset("soc-evidence-ledger-hero.jpg")} alt="" />
             <div className="hero-rail">
               <div className="hero-card">
                 <div className="hero-card-label"><span className="dot" style={{ color: "#3d7e61" }} /> Completed baseline</div>
@@ -224,7 +233,7 @@ export default function Home() {
               </FlowReveal>
               <FlowReveal delay={0.1}>
                 <div className="anatomy-side">
-                  <div className="provenance-visual"><img src="/manus-storage/provenance-threads_4b037823.jpg" alt="Abstract provenance threads separating trusted and attacker-writable alert content" /></div>
+                  <div className="provenance-visual"><img src={asset("provenance-threads.jpg")} alt="Abstract provenance threads separating trusted and attacker-writable alert content" /></div>
                   <StatusStamp kind="illustrative">Interactive explainer</StatusStamp>
                   <h3 style={{ margin: "16px 0 9px", color: "var(--ink)", font: "400 29px/1.05 'DM Serif Display', serif", letterSpacing: "-0.03em" }}>Show the evidence boundary.</h3>
                   <p style={{ margin: 0, color: "#617587", fontSize: 14, lineHeight: 1.65 }}>Provenance must be preserved through normalization, rationales, calibration, and analyst review.</p>
@@ -251,7 +260,7 @@ export default function Home() {
               </div>
             </div>
             <div className="policy-demo">
-              <div className="policy-art"><img src="/manus-storage/calibration-gate_0e6f79a1.jpg" alt="Abstract calibrated triage gate illustration" /></div>
+              <div className="policy-art"><img src={asset("calibration-gate.jpg")} alt="Abstract calibrated triage gate illustration" /></div>
               <div className="policy-panel">
                 <StatusStamp kind="illustrative">Illustrative P1 output</StatusStamp>
                 <h3 style={{ margin: "19px 0 15px", color: "var(--ink)", font: "400 33px/1 'DM Serif Display', serif", letterSpacing: "-0.035em" }}>Policy output must be structured—not assumed safe.</h3>
@@ -413,7 +422,7 @@ export default function Home() {
           <div className="content-frame">
             <p className="section-kicker" style={{ color: "#9ab4c4" }}>10 / Central takeaway</p>
             <h2 id="closing-heading" className="closing-quote">The research does not ask whether AI can always replace an analyst. It asks <em>when it should be trusted</em>, when it should abstain, and whether that trust survives adversarial content inside the evidence itself.</h2>
-            <div className="closing-footer"><div><p>Success is not simply higher accuracy. It is evidence about whether attacked errors stay below the automation gate—and an honest record if they do not.</p><div className="integrity-list"><span><LockKeyhole size={13} /> No confidential records</span><span><ShieldCheck size={13} /> Assist, not replace</span><span><XCircle size={13} /> No automatic containment</span><span><CheckCircle2 size={13} /> Preserve negative results</span></div></div><div className="footer-mark"><img src="/manus-storage/evidence-gate-logo_7f83e168.png" alt="" /> Trustworthy Triage<br />Research Visualization</div></div>
+            <div className="closing-footer"><div><p>Success is not simply higher accuracy. It is evidence about whether attacked errors stay below the automation gate—and an honest record if they do not.</p><div className="integrity-list"><span><LockKeyhole size={13} /> No confidential records</span><span><ShieldCheck size={13} /> Assist, not replace</span><span><XCircle size={13} /> No automatic containment</span><span><CheckCircle2 size={13} /> Preserve negative results</span></div></div><div className="footer-mark"><img src={asset("evidence-gate-logo.png")} alt="" /> Trustworthy Triage<br />Research Visualization</div></div>
           </div>
         </section>
       </main>
