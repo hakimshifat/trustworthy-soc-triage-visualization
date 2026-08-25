@@ -564,7 +564,7 @@ function DemoPlayer({
               <AnimatePresence mode="wait">
                 <motion.div
                   key={scene.id}
-                  className={`demo-stage scene-${scene.id}`}
+                  className={`demo-stage demo-scene-${scene.id}`}
                   initial={reduced ? false : { opacity: 0, y: 15, filter: "blur(5px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={reduced ? undefined : { opacity: 0, y: -12, filter: "blur(4px)" }}

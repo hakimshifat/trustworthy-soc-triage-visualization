@@ -11,3 +11,8 @@
 - [x] Animate the SOC overload, provenance, calibration, decision-gate, attack, and safety-outcome story beats.
 - [x] Preserve research-integrity labels across every animated scene.
 - [x] Test the animated player on desktop and mobile, then republish it to GitHub Pages.
+
+## Responsive Animation Repair
+
+- [x] Rebuild the selective-triage scene composition so its gate, routes, and headline never overlap the player controls.
+- [ ] Verify the corrected scene at the reported compact desktop viewport and republish the live site.
