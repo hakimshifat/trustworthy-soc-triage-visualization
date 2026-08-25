@@ -169,6 +169,7 @@ export default function Home() {
   const [attackClass, setAttackClass] = useState("Direct override");
   const [attackField, setAttackField] = useState("Command line");
   const [failureMode, setFailureMode] = useState<FailureMode>("danger");
+  const [maskingRun, setMaskingRun] = useState(0);
   const [demoOpen, setDemoOpen] = useState(false);
   const [demoSceneIndex, setDemoSceneIndex] = useState(0);
   const [demoPlaying, setDemoPlaying] = useState(true);
@@ -214,6 +215,7 @@ export default function Home() {
         </a>
         <nav className="header-nav" aria-label="Research sections">
           <a href="#status">Status</a>
+          <a href="#masking">Data masking</a>
           <a href="#system">System</a>
           <a href="#attack">Attack test</a>
           <a href="#evidence">Evidence</a>
@@ -317,9 +319,51 @@ export default function Home() {
 
           <div className="section-rule" />
 
+          <section className="section masking-section" id="masking" aria-labelledby="masking-heading">
+            <SectionHeader
+              kicker="03 / Confidential-data preparation"
+              title={<>Protect the record.<br />Preserve the <i>security meaning.</i></>}
+              summary={<>Confidential records remain inside an access-controlled workspace. Data masking is a preparation process—not evidence that the corpus is anonymized, approved, or ready for experiments.</>}
+              aside="ACTIVE PREPARATION"
+            />
+            <div className="masking-lab">
+              <FlowReveal>
+                <div className="masking-stage" key={maskingRun}>
+                  <div className="masking-stage-head"><StatusStamp kind="active">Masking in progress</StatusStamp><span>SAFE ANIMATED EXPLAINER</span></div>
+                  <div className="masking-stream" aria-hidden="true"><i /><i /><i /><i /><i /></div>
+                  <div className="masking-sequence">
+                    <article className="masking-step step-access"><span className="mask-icon"><LockKeyhole size={18} /></span><b>Access boundary</b><small>Controlled workspace</small></article>
+                    <article className="masking-step step-detect"><span className="mask-icon"><ScanSearch size={18} /></span><b>Detect fields</b><small>Names, hosts, IDs, secrets</small></article>
+                    <article className="masking-step step-replace"><span className="mask-icon"><RefreshCcw size={18} /></span><b>Mask safely</b><small>Pseudonymize or redact</small></article>
+                    <article className="masking-step step-preserve"><span className="mask-icon"><ShieldCheck size={18} /></span><b>Check meaning</b><small>Security semantics retained</small></article>
+                    <article className="masking-step step-review"><span className="mask-icon"><UserRoundCheck size={18} /></span><b>Human review</b><small>Privacy, labels, provenance</small></article>
+                    <article className="masking-step step-candidate"><span className="mask-icon"><Database size={18} /></span><b>Candidate dataset</b><small>Readiness decision pending</small></article>
+                  </div>
+                  <div className="masking-records">
+                    <div className="protected-record"><span><LockKeyhole size={13} /> PROTECTED SOURCE RECORD</span><i /><i /><i /><i /></div>
+                    <ArrowRight className="masking-arrow" size={23} />
+                    <div className="safe-record"><span><ShieldCheck size={13} /> SAFE EXPLAINER OUTPUT</span><code>HOST_0042</code><code>USER_0017</code><code>DOMAIN_0003.invalid</code><code>/home/USER_0017/project/file.exe</code></div>
+                  </div>
+                  <p className="masking-guardrail"><Info size={15} /> All values shown here are invented masking examples. No raw confidential record or reversible mapping is displayed.</p>
+                </div>
+              </FlowReveal>
+              <FlowReveal delay={0.08}>
+                <aside className="masking-notes">
+                  <StatusStamp kind="active">Readiness is pending</StatusStamp>
+                  <h3>Masking must retain evidence without retaining identities.</h3>
+                  <p>The review checks for direct identifiers, internal infrastructure details, credentials, private addresses, organization references, and indirect identifiers in free text. Where relationships matter, approved stable pseudonyms can preserve them without exposing the source value.</p>
+                  <div className="masking-callout"><FileLock2 size={19} /><p><strong>Not experiment-ready.</strong> Masking quality, labels, provenance, duplicates, contamination, shortcut risk, and field semantics must all be assessed before any dataset GO decision.</p></div>
+                  <button className="secondary-action masking-replay" onClick={() => setMaskingRun((run) => run + 1)}><RefreshCcw size={15} /> Replay safe animation</button>
+                </aside>
+              </FlowReveal>
+            </div>
+          </section>
+
+          <div className="section-rule" />
+
           <section className="section pipeline-section" id="system" aria-labelledby="system-heading">
             <SectionHeader
-              kicker="03 / The bounded system"
+              kicker="04 / The bounded system"
               title={<>Classify. Calibrate.<br /><i>Then</i> decide whether to defer.</>}
               summary={<>The proposed system is deliberately narrow: binary TP/FP triage of already-raised alerts. It does not hunt, contain, remediate, or replace the analyst.</>}
               aside="OPERATIONAL FLOW"
@@ -348,7 +392,7 @@ export default function Home() {
 
           <section className="section" id="calibration" aria-labelledby="calibration-heading">
             <SectionHeader
-              kicker="04 / Correctness, not maliciousness"
+              kicker="05 / Correctness, not maliciousness"
               title={<>A separate component must ask:<br /><i>“Is the verdict likely right?”</i></>}
               summary={<>The calibrator receives the alert, policy rationale, cited evidence, and verdict. It estimates correctness of that verdict—<strong>not the probability that the alert is malicious.</strong></>}
               aside="SIMULATED VALUES"
@@ -367,7 +411,7 @@ export default function Home() {
 
           <section className="section" id="gate" aria-labelledby="gate-heading">
             <SectionHeader
-              kicker="05 / Selective decision gate"
+              kicker="06 / Selective decision gate"
               title={<>Every uncertain result<br />returns to the <i>analyst.</i></>}
               summary={<>Final TP and FP thresholds must be selected on clean validation data and frozen before adversarial tests are opened. The slider below is a visual explainer only—<strong>not a claimed threshold or precision result.</strong></>}
               aside="INTERACTIVE EXPLAINER"
@@ -396,7 +440,7 @@ export default function Home() {
 
           <section className="section" id="attack" aria-labelledby="attack-heading">
             <SectionHeader
-              kicker="06 / Paired adversarial test"
+              kicker="07 / Paired adversarial test"
               title={<>Change one writable field.<br />Keep the <i>label</i> fixed.</>}
               summary={<>The P3 design compares a clean source alert with an injected copy. The ground-truth TP/FP label and trusted metadata stay unchanged; the same frozen system evaluates both records.</>}
               aside="P3 · PLANNED"
@@ -420,7 +464,7 @@ export default function Home() {
 
           <section className="section" id="failure" aria-labelledby="failure-heading">
             <SectionHeader
-              kicker="07 / The safety-critical failure"
+              kicker="08 / The safety-critical failure"
               title={<>The danger is not only an error.<br />It is an error the system is <i>willing to automate.</i></>}
               summary={<>Both sequences below are hypotheses for P3 testing. A useful result may show that the system abstains safely—or that clean-trained calibration stays confidently wrong under attack.</>}
               aside="HYPOTHESES, NOT FINDINGS"
@@ -444,7 +488,7 @@ export default function Home() {
 
           <section className="section" id="splits" aria-labelledby="splits-heading">
             <SectionHeader
-              kicker="08 / Experimental separation"
+              kicker="09 / Experimental separation"
               title={<>One source alert, one partition.<br /><i>Derivatives never become new samples.</i></>}
               summary={<>The policy, calibrator, threshold, and test roles must remain disjoint. Eight archived model responses from one source alert are eight outputs—not eight independent alerts.</>}
               aside="METHOD CONTROL"
@@ -465,7 +509,7 @@ export default function Home() {
 
           <section className="section" id="evidence" aria-labelledby="evidence-heading">
             <SectionHeader
-              kicker="09 / Completed P0 evidence"
+              kicker="10 / Completed P0 evidence"
               title={<>The classical floor is a real result.<br />Its limits are <i>real, too.</i></>}
               summary={<>The completed baseline is a dataset-specific floor, not a production accuracy claim. The public corpus has 178 alerts and 74 observed rule clusters; uncertainty is deliberately reported.</>}
               aside="COMPLETED PROJECT RESULT"
@@ -491,7 +535,7 @@ export default function Home() {
 
         <section className="closing" aria-labelledby="closing-heading">
           <div className="content-frame">
-            <p className="section-kicker" style={{ color: "#9ab4c4" }}>10 / Central takeaway</p>
+            <p className="section-kicker" style={{ color: "#9ab4c4" }}>11 / Central takeaway</p>
             <h2 id="closing-heading" className="closing-quote">The research does not ask whether AI can always replace an analyst. It asks <em>when it should be trusted</em>, when it should abstain, and whether that trust survives adversarial content inside the evidence itself.</h2>
             <div className="closing-footer"><div><p>Success is not simply higher accuracy. It is evidence about whether attacked errors stay below the automation gate—and an honest record if they do not.</p><div className="integrity-list"><span><LockKeyhole size={13} /> No confidential records</span><span><ShieldCheck size={13} /> Assist, not replace</span><span><XCircle size={13} /> No automatic containment</span><span><CheckCircle2 size={13} /> Preserve negative results</span></div></div><div className="footer-mark"><img src={asset("evidence-gate-logo.png")} alt="" /> Trustworthy Triage<br />Research Visualization</div></div>
           </div>
