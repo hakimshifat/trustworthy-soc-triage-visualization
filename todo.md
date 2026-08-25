@@ -10,4 +10,4 @@
 - [x] Add a guided scene player with play, pause, replay, and scene navigation controls.
 - [x] Animate the SOC overload, provenance, calibration, decision-gate, attack, and safety-outcome story beats.
 - [x] Preserve research-integrity labels across every animated scene.
-- [ ] Test the animated player on desktop and mobile, then republish it to GitHub Pages.
+- [x] Test the animated player on desktop and mobile, then republish it to GitHub Pages.
